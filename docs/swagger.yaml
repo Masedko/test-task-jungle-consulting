@@ -1,0 +1,12 @@
+info:
+  contact: {}
+  description: API for Test task jungle consulting
+  title: Test task jungle consulting
+  version: "1.0"
+paths: {}
+securityDefinitions:
+  JWT:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
