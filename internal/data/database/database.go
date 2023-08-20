@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 	"log"
 	"test-task-jungle-consulting/configuration"
+	"test-task-jungle-consulting/internal/core/models"
 )
 
 func ConnectDB(config *configuration.EnvConfigModel) *gorm.DB {
@@ -24,7 +25,10 @@ func ConnectDB(config *configuration.EnvConfigModel) *gorm.DB {
 	//	Extension for postgresql uuid support
 	db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 
-	err = db.AutoMigrate()
+	err = db.AutoMigrate(
+		models.Image{},
+		models.User{},
+	)
 	if err != nil {
 		log.Fatal("Migration Failed:\n", err.Error())
 	}

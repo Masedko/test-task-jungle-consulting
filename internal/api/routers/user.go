@@ -7,6 +7,6 @@ import (
 
 func NewUserRouter(c *controllers.UserController) func(router fiber.Router) {
 	return func(router fiber.Router) {
-		router.Post("/login")
+		router.Post("/login", c.Login)
 	}
 }

@@ -3,6 +3,7 @@ package routers
 import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/swagger"
+	_ "test-task-jungle-consulting/docs"
 )
 
 func NewDocsRouter() func(router fiber.Router) {

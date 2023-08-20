@@ -33,6 +33,7 @@ type Controllers struct {
 type Routers struct {
 	UserRouter  func(router fiber.Router)
 	ImageRouter func(router fiber.Router)
+	DocsRouter  func(router fiber.Router)
 }
 
 func Run(cfg *configuration.EnvConfigModel) {
@@ -56,6 +57,7 @@ func Run(cfg *configuration.EnvConfigModel) {
 	r := Routers{
 		UserRouter:  routers.NewUserRouter(c.UserController),
 		ImageRouter: routers.NewImageRouter(c.ImageController),
+		DocsRouter:  routers.NewDocsRouter(),
 	}
 
 	app := fiber.New(fiber.Config{ErrorHandler: middleware.ErrorHandler})
@@ -69,6 +71,7 @@ func Run(cfg *configuration.EnvConfigModel) {
 
 	r.UserRouter(app)
 	r.ImageRouter(app)
+	r.DocsRouter(app)
 
 	log.Fatal(app.Listen(fmt.Sprintf(":%s", cfg.APIPort)))
 }

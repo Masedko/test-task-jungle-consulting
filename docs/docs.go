@@ -14,7 +14,230 @@ const docTemplate = `{
     },
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
-    "paths": {},
+    "paths": {
+        "/image/{imageURL}": {
+            "get": {
+                "description": "Retrieve an image from the server using its URL.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/octet-stream"
+                ],
+                "tags": [
+                    "image"
+                ],
+                "summary": "Get image by URL",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "URL of the image",
+                        "name": "imageURL",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image content",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/images": {
+            "get": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Get images for specific user",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "image"
+                ],
+                "summary": "Get images",
+                "responses": {
+                    "200": {
+                        "description": "Images",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/dtos.GetImage"
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Couldn't validate JWT",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.MessageResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Couldn't get images",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Login",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Login",
+                "parameters": [
+                    {
+                        "description": "Data to login",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dtos.LoginInput"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Bearer token (login information)",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.LoginOutput"
+                        }
+                    },
+                    "400": {
+                        "description": "Couldn't get token",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.MessageResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Couldn't parse body (login information)",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.MessageResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/upload-picture": {
+            "post": {
+                "security": [
+                    {
+                        "JWT": []
+                    }
+                ],
+                "description": "Upload picture for user",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "image"
+                ],
+                "summary": "Upload picture",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Body with picture",
+                        "name": "picture",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Image information",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.MessageResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Couldn't validate JWT",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.MessageResponse"
+                        }
+                    },
+                    "422": {
+                        "description": "Couldn't get image from form",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.MessageResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Couldn't save image",
+                        "schema": {
+                            "$ref": "#/definitions/dtos.MessageResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "dtos.GetImage": {
+            "type": "object",
+            "properties": {
+                "imageURL": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.LoginInput": {
+            "type": "object",
+            "required": [
+                "name",
+                "password"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.LoginOutput": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "dtos.MessageResponse": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    },
     "securityDefinitions": {
         "JWT": {
             "type": "apiKey",

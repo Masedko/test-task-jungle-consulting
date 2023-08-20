@@ -1,9 +1,150 @@
+definitions:
+  dtos.GetImage:
+    properties:
+      imageURL:
+        type: string
+    type: object
+  dtos.LoginInput:
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - name
+    - password
+    type: object
+  dtos.LoginOutput:
+    properties:
+      token:
+        type: string
+    type: object
+  dtos.MessageResponse:
+    properties:
+      message:
+        type: string
+    type: object
 info:
   contact: {}
   description: API for Test task jungle consulting
   title: Test task jungle consulting
   version: "1.0"
-paths: {}
+paths:
+  /image/{imageURL}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve an image from the server using its URL.
+      parameters:
+      - description: URL of the image
+        in: path
+        name: imageURL
+        required: true
+        type: string
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: Image content
+          schema:
+            type: file
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/dtos.MessageResponse'
+      summary: Get image by URL
+      tags:
+      - image
+  /images:
+    get:
+      description: Get images for specific user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Images
+          schema:
+            items:
+              $ref: '#/definitions/dtos.GetImage'
+            type: array
+        "422":
+          description: Couldn't validate JWT
+          schema:
+            $ref: '#/definitions/dtos.MessageResponse'
+        "500":
+          description: Couldn't get images
+          schema:
+            $ref: '#/definitions/dtos.MessageResponse'
+      security:
+      - JWT: []
+      summary: Get images
+      tags:
+      - image
+  /login:
+    post:
+      description: Login
+      parameters:
+      - description: Data to login
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dtos.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Bearer token (login information)
+          schema:
+            $ref: '#/definitions/dtos.LoginOutput'
+        "400":
+          description: Couldn't get token
+          schema:
+            $ref: '#/definitions/dtos.MessageResponse'
+        "422":
+          description: Couldn't parse body (login information)
+          schema:
+            $ref: '#/definitions/dtos.MessageResponse'
+      security:
+      - JWT: []
+      summary: Login
+      tags:
+      - user
+  /upload-picture:
+    post:
+      consumes:
+      - application/json
+      description: Upload picture for user
+      parameters:
+      - description: Body with picture
+        in: formData
+        name: picture
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Image information
+          schema:
+            $ref: '#/definitions/dtos.MessageResponse'
+        "401":
+          description: Couldn't validate JWT
+          schema:
+            $ref: '#/definitions/dtos.MessageResponse'
+        "422":
+          description: Couldn't get image from form
+          schema:
+            $ref: '#/definitions/dtos.MessageResponse'
+        "500":
+          description: Couldn't save image
+          schema:
+            $ref: '#/definitions/dtos.MessageResponse'
+      security:
+      - JWT: []
+      summary: Upload picture
+      tags:
+      - image
 securityDefinitions:
   JWT:
     in: header
